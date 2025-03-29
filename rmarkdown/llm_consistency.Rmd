@@ -1,0 +1,715 @@
+---
+title: "Evaluating the Consistency of Multiple LLMs with Intra and Inter Reliability Methods"
+author:
+  - name: "Fadel M. Megahed ^[Email: fmegahed@miamioh.edu | Phone: +1-513-529-4185 | Website: <a href=\"https://miamioh.edu/fsb/directory/?up=/directory/megahefm\">Miami University Official</a>]"
+    affiliation: Farmer School of Business, Miami University
+  - name: "Ying-Ju (Tessa) Chen ^[Email: ychen4@udayton.edu | Phone: +1-937-229-2405 | Website: <a href=\"https://udayton.edu/directory/artssciences/mathematics/chen-ying-ju.php\">University of Dayton Official</a>]"
+    affiliation: Department of Mathematics, University of Dayton
+  - name: "Allison Jones-Farmer ^[Email: farmerl2@miamioh.edu | Phone: +1-513-529-4823 | Website: <a href=\"https://miamioh.edu/fsb/directory/?up=/directory/farmerl2\">Miami University Official</a>]"
+    affiliation: Farmer School of Business, Miami University
+  - name: "Gabe Lee ^[Email: leeyh2@miamioh.edu | Phone: +1-513-529-2164 | Website: <a href=\"https://miamioh.edu/fsb/directory/?up=/directory/ leeyh2\">Miami University Official</a>]"
+    affiliation: Farmer School of Business, Miami University
+  - name: "Sven Knoth ^[Email: knoth@hsu-hh.de | Phone: +49-40-6541-3400| Website: <a href=\"https://www.hsu-hh.de/compstat/en/sven-knoth-2\">Helmut-Schmidt-Universität Official</a>]"
+    affiliation: Helmut-Schmidt-Universität
+  - name: "Katie Ross^[Email: rossks@miamioh.edu | Phone: +1-513-529-4826 | Website: <a href=\"https://miamioh.edu/fsb/departments/information-systems-analytics/index.html\">Miami University Official</a>]"
+    affiliation: Farmer School of Business, Miami University
+  - name: "Brooke Wang ^[Email: wangj249@miamioh.edu | Phone: +1-513-529-1577 | Website: <a href=\"https://miamioh.edu/fsb/directory/?up=/directory/wangj249\">Miami University Official</a>]"
+    affiliation: Farmer School of Business, Miami University
+  - name: "Inez M. Zwetsloot ^[Email: i.m.zwetsloot@uva.nl | Website: <a href=\"https://www.uva.nl/en/profile/z/w/i.m.zwetsloot/i.m.zwetsloot.html?cb\">University of Amsterdam Official</a>]"
+    affiliation: Faculty of Economics and Business, University of Amsterdam
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+    code_folding: show
+    code_download: TRUE
+    theme: simplex
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preface {-}
+
+In this project, we utilize the open-source `r fontawesome::fa(name = "r-project", fill = "steelblue")` programming language, alongside Python, to evaluate the consistency of large language models (LLMs) through intra- and inter-reliability methods. For `r fontawesome::fa(name = "r-project", fill = "steelblue")`, we are using *version 4.4.2 (2024-10-31 ucrt)*, and we manage package dependencies with `renv`. The `renv` package allows for isolated project environments, ensuring the same versions of `r fontawesome::fa(name = "r-project", fill = "steelblue")` packages are used consistently. If you're new to `renv`, it enables the creation of "snapshots" for package versions, ensuring reproducibility across different systems. You can find all package versions used in this project in our `renv` repository at [this link](https://github.com/fmegahed/llm_constitency/tree/main/renv).
+
+This document is structured using RMarkdown, which seamlessly integrates both `r fontawesome::fa(name = "r-project", fill = "steelblue")` and Python code chunks. Readers can tell the difference between `r fontawesome::fa(name = "r-project", fill = "steelblue")` and Python code chunks by downloading the raw RMarkdown file from [this repository](https://github.com/fmegahed/llm_consistency/tree/main/rmarkdown). In addition, the document features a **floating table of contents (TOC)** on the side, which makes navigation through the sections more convenient. The TOC follows the reader as they scroll, allowing quick access to different sections.
+
+We’ve also implemented **foldable code chunks**, enabling the user to expand and collapse code as needed to focus on the explanations or results. This feature improves the document’s readability by allowing you to hide the code while reading the main content. If you would like to view or modify the raw code, click the "Code" button at the top of the document to download the full RMarkdown file. This gives you access to all the code chunks used in the analysis.
+
+For the Python sections, we are using a conda environment with *Python version 3.12.9*. The required Python packages can be installed via the `requirements.txt` file, available [here](https://github.com/fmegahed/llm_consistency/blob/main/requirements.txt). The RMarkdown document links to the conda environment, allowing Python chunks to execute alongside the `r fontawesome::fa(name = "r-project", fill = "steelblue")` code in the same workflow.
+
+To securely store API secrets for the large language models (LLMs) accessed in the Python chunks, we use a `.env` file that holds these keys in a safe, environment-specific manner. Similarly, for the stock news API accessed in the `r fontawesome::fa(name = "r-project", fill = "steelblue")` sections, we save the API secret in a project-based `.Renviron` file. Both files keep sensitive credentials secure and allow us to avoid hardcoding API secrets directly in the code. For obvious security reasons, we did not push these `.env` and `.Renviron` files to our GitHub repository.
+
+All input and output files for this project can be accessed and downloaded from our [GitHub repository](https://github.com/fmegahed/llm_consistency).
+
+
+# Objectives of this Analysis {#objectives}
+
+- We present minimum sample size calculations for our binary classification experiments.  
+- We describe the experimental setup for the consistency analysis of multiple LLMs.  
+- We provide a custom function for LLM classification experiments.  
+- We present an example of a binary classification experiment, using the LLMs to label the sentiment of news articles related to the stock market, and utilize the intra- and inter-rater reliability methods to evaluate the consistency of the LLMs.
+
+
+
+# Sample Size Calculations for our Binary Classification Experiment {#sample_size}
+
+The minimum sample size for each of our experiments was computed for: **simple percent agreement**, **Gwet's AC1 coefficient**, and **Brennan-Prediger coefficient**. The minimum sample size was computed using the tables in [Handbook of Inter-Rater Reliability, 5th Edition. Volume 1: Analysis of Categorical Ratings](https://sites.fastspring.com/agreestat/instant/cac5ed978_1_7923_5463_2e). The sample sizes were computed for the three different metrics, with a margin of error of 0.05, a confidence level of 0.90, and for five replicates.
+
+```{r binary_classification_sample_size, echo=FALSE, results='asis'}
+# create a data frame of the obtained sample size results
+binary_data = data.frame(
+  metric = c("Percent Agreement", "Gwet’s AC1 Coefficient", "Brennan-Prediger Coefficient"),
+  `sample size` = c(216, 1317, 847) |> scales::comma()
+)
+
+# generate the table in HTML format
+knitr::kable(
+  binary_data, format = "html", table.attr = "style='width:50%;'", 
+  align = c('l','r')
+  ) |>
+  kableExtra::kable_styling(full_width = FALSE) |>
+  kableExtra::column_spec(1, bold = TRUE)
+```
+
+Therefore, using the highest sample size among the three metrics, we need at **least 1,317 samples** for the binary classification experiment.
+
+
+
+# Experimental Setup for the Consistency Analysis {#experimental_setup}
+
+## LLMs Used and their API Keys {#llm_setup}
+
+In our experiments, we selected the following LLMs:
+
+**Closed source proprietary foundation models:**
+
+- `claude-3-7-sonnet-20250219`, which is [Anthropic's current best model](https://www.anthropic.com/news/claude-3-7-sonnet) as of March 12, 2025;  
+-`claude-3-5-haiku-20241022`, which represents the smallest model provided by [Anthropic](https://docs.anthropic.com/en/docs/about-claude/models#model-names) as of March 12, 2025;  
+
+
+- `gpt-4o-2024-11-20`, which is [OpenAI's latest snapshot of the 4o series](https://platform.openai.com/docs/models/gpt-4o) as of March 12, 2025. Note that we do not examine the more recent and capable [GPT-4.5 Preview Model](https://platform.openai.com/docs/models/gpt-4.5-preview) as they are very expensive ($150 per million output tokens versus the \$10 per million output tokens for the GPT-4o series);  
+- `gpt-4o-mini-2024-07-18`, which is [OpenAI's latest stable and mini model](https://platform.openai.com/docs/models/gpt-4o-mini) as of March 12, 2025. These models are fast and are cost optimized for low-latency applications;  
+
+
+**Open LLMs**
+
+The Open LLMs were run locally using the Ollama interface (v 0.6.0), with the exception of the `command-r-plus-08-2024` which we run using the Cohere API as its 104B parameters would be too large to run on our GPU (NVIDIA RTX 5000 Ada Generation, with 32GB of Graphics Memory). The models are:
+
+- `command-r-plus-08-2024`, which is [Cohere's latest large language model](https://docs.cohere.com/docs/command-r-plus) as of March 12, 2025;  
+- `command-r7b`, which is [Cohere's latest small language model](https://docs.cohere.com/docs/command-r7b) as of March 12, 2025. **Note that we are running this 7B parameter model locally, via the Ollama interface.**;  
+
+- `deepseek-r1:7B`, which is a popular model from [DeepSeek](https://ollama.com/library/deepseek-r1) and is the default when pulling the `deepseek-r1` models from Ollama;
+- `deepseek-r1:1.5B`, which is the smallest model from [DeepSeek](https://ollama.com/library/deepseek-r1);  
+
+<!-- - `exaone-deep:7.8b`, which is the medium-sized open-sourced EXAONE model from LG AI, which was released on March 19, 2025;   -->
+<!-- - `exaone-deep:2.4b`, which is the smallest open-sourced EXAONE model from LG AI, which was released on March 19, 2025; -->
+
+- `gemma3:27B`, which is the largest open-sourced Gemma3 model from Google, which was released on March 12, 2025;
+- `gemma3:1B`, which is the smallest open-sourced Gemma3 model from Google, which was released on March 12, 2025;  
+
+- `llama3.2:3B`, Meta went small with its open-sourced Llama3.2 model; this is the largest of the two models that they released as part of the Llama3.2 series;  
+- `llama3.2:1B`, Meta went small with its open-sourced Llama3.2 model; this is the smallest of the two models that they released as part of the Llama3.2 series;
+
+- `phi4:latest`, Phi-4 is a 14B parameter, state-of-the-art open model from Microsoft.;
+- `phi4-mini`, which is the smallest open-sourced Phi Model from Microsoft with 3.8B parameters;
+
+
+```{python models}
+# load the necessary libraries
+from dotenv import load_dotenv, find_dotenv
+from langchain.prompts.chat import ChatPromptTemplate
+
+# Find the .env path
+dotenv_path = find_dotenv()
+
+# load the environment variables
+load_dotenv(dotenv_path, override=True)
+
+# the API keys for the different LLMs
+openai_api_key = os.getenv('OPENAI_API_KEY')
+anthropic_api_key = os.getenv('ANTHROPIC_API_KEY')
+cohere_api_key = os.getenv('COHERE_API_KEY')
+
+
+# the LLM models to be used for labeling
+# we ran this over two different run times since we
+# had to abort the "exaone-deep" models as they were quite slow
+# other commented out models were successfully run in the first run
+# so we did not need to run them again
+models = [
+  # 'claude-3-7-sonnet-20250219',
+  # 'claude-3-5-haiku-20241022',
+  
+  'gpt-4o-2024-11-20',
+  'gpt-4o-mini-2024-07-18',
+  
+  # 'command-r-plus-08-2024',
+  # 'command-r7b',
+  
+  # 'deepseek-r1:7B',
+  # 'deepseek-r1:1.5B',
+  
+  # 'exaone-deep:7.8b',
+  # 'exaone-deep:2.4b',
+  
+  'gemma3:27B',
+  'gemma3:1B',
+  
+  'llama3.2:3B',
+  'llama3.2:1B',
+  
+  'phi4:latest',
+  'phi4-mini'
+  ]
+```
+
+## A Custom Function for LLM Calls {#custom_llm_function}
+
+We created a custom function, `generalized_chat_completion`, to facilitate the interaction with the LLMs and generate chat completions for each news article in the dataset. The function takes the following parameters: 
+
+- `csv_path`: the path to the CSV file containing the news articles;
+- `columns_to_keep`: the columns to retain in the final CSV output;
+- `models`: a list of chat models to be used;
+- `chat_prompt_template`: the prompt template for generating chat messages;
+- `columns_for_chat_prompt`: the columns to be used as the user input in the chat prompt template;
+- `num_replicates`: the number of replicates per model;
+- `temp`: the temperature for the chat model;
+- `max_num_tokens`: the maximum number of tokens for chat completions;
+- `save_to_csv`: whether to save results to CSV;
+- `output_file`: the path to the output CSV file; and 
+- `retry_attempts`: the number of retry attempts for API errors.
+
+The function reads the CSV file, replicates the data based on the number of models and replicates, sorts the data frame, and iterates through each row to generate chat completions. It uses the specified chat model to generate chat responses, with error handling for API errors. The function saves the results to a CSV file if required and returns the last chat response content if `save_to_csv` is `False`.
+
+```{python custom_fun}
+import os
+import time
+
+import pandas as pd
+import datetime as dt
+
+from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
+from langchain_cohere import ChatCohere
+from langchain_ollama import ChatOllama
+
+def generalized_chat_completion(
+    csv_path,
+    columns_to_keep,
+    models,
+    chat_prompt_template,
+    columns_for_chat_prompt,
+    num_replicates,
+    temp=0,
+    max_num_tokens=3000,
+    save_to_csv=True,
+    output_file='../results/generalized_classification.csv',
+    retry_attempts=3
+):
+    """
+    Generalized function to generate chat completions from a CSV file, with flexible parameters
+    for various chat models, sorting order, and error handling.
+    
+    Parameters:
+        csv_path (str): Path to the CSV file to read data from.
+        columns_to_keep (list): Columns to retain in the final CSV output.
+        models (list): List of chat models to be used.
+        chat_prompt_template (str): The prompt template for generating chat messages.
+        columns_for_chat_prompt (list): Columns to be used as the user input in the chat prompt template.
+        num_replicates (int): Number of replicates per model.
+        temp (float): Temperature for the chat model.
+        max_num_tokens (int): Maximum number of tokens for chat completions.
+        save_to_csv (bool): Whether to save results to CSV.
+        output_file (str): Path to the output CSV file.
+        retry_attempts (int): Number of retry attempts for API errors.
+    
+    Returns:
+        None or the last chat response content if save_to_csv is False.
+    """
+    # read the CSV file
+    df = pd.read_csv(csv_path)
+    num_rows = df.shape[0]
+    total_repeats = len(models) * num_replicates
+
+    # add an index column as 'article_num'
+    df['article_num'] = df.index
+
+    # replicate the data frame based on the total repeats
+    expanded_df = pd.concat([df] * total_repeats, ignore_index=True)
+
+    # generate model and replicate columns
+    model_column = [model for model in models for _ in range(num_replicates * num_rows)]
+    replicate_column = [i + 1 for _ in range(len(models)) for i in range(num_replicates) for _ in range(num_rows)]
+
+    # add the model and replicate columns to the data frame
+    expanded_df['replicate'] = replicate_column
+    expanded_df['chat_model'] = model_column
+
+    # sort the data frame by 'chat_model', 'article_num' and 'replicate'
+    expanded_df = expanded_df.sort_values(by=['chat_model','article_num', 'replicate']).reset_index(drop=True)
+
+    # iterate through each row and generate chat completions
+    for index in range(expanded_df.shape[0]):
+        prompt_data = {col: expanded_df.loc[index, col] for col in columns_for_chat_prompt}
+        messages = chat_prompt_template.format_messages(**prompt_data)
+
+        # extract model name and assign the correct chat model
+        model = expanded_df.loc[index, 'chat_model']
+        chat_model = None
+        if model == 'gpt-4o-2024-11-20':
+            chat_model = ChatOpenAI(model="gpt-4o-2024-11-20", temperature=temp, max_tokens=max_num_tokens)
+        elif model == 'gpt-4o-mini-2024-07-18':
+            chat_model = ChatOpenAI(model="gpt-4o-mini-2024-07-18", temperature=temp, max_tokens=max_num_tokens)
+        
+        elif model == "claude-3-7-sonnet-20250219":
+            chat_model = ChatAnthropic(model="claude-3-7-sonnet-20250219", temperature=temp, max_tokens=max_num_tokens)
+        elif model == "claude-3-5-haiku-20241022":
+            chat_model = ChatAnthropic(model="claude-3-5-haiku-20241022", temperature=temp, max_tokens=max_num_tokens)
+        
+        elif model == "command-r-plus-08-2024":
+            chat_model = ChatCohere(model="command-r-plus-08-2024", temperature=temp, max_tokens=max_num_tokens)
+        elif model == "command-r7b":
+            chat_model = ChatOllama(model="command-r7b", temperature=temp, max_tokens=max_num_tokens)
+        
+        elif model == 'deepseek-r1:7B':
+            chat_model = ChatOllama(model="deepseek-r1:7B", temperature=temp, max_tokens=max_num_tokens)
+        elif model == 'deepseek-r1:1.5B':
+            chat_model = ChatOllama(model="deepseek-r1:1.5B", temperature=temp, max_tokens=max_num_tokens)
+            
+        elif model == 'exaone-deep:7.8b': 
+            chat_model = ChatOllama(model="exaone-deep:7.8b", temperature=temp, max_tokens=max_num_tokens)
+        
+        elif model == 'exaone-deep:2.4b':  
+            chat_model = ChatOllama(model="exaone-deep:2.4b", temperature=temp, max_tokens=max_num_tokens)
+        
+        elif model == 'gemma3:27B':
+            chat_model = ChatOllama(model="gemma3:27B", temperature=temp, max_tokens=max_num_tokens)
+        elif model == 'gemma3:1B':
+            chat_model = ChatOllama(model="gemma3:1B", temperature=temp, max_tokens=max_num_tokens)
+        
+        elif model == 'llama3.2:3B':
+            chat_model = ChatOllama(model="llama3.2:3B", temperature=temp, max_tokens=max_num_tokens)
+        elif model == 'llama3.2:1B':
+            chat_model = ChatOllama(model="llama3.2:1B", temperature=temp, max_tokens=max_num_tokens)
+        
+        elif model == 'phi4:latest':
+            chat_model = ChatOllama(model="phi4:latest", temperature=temp, max_tokens=max_num_tokens)
+        elif model == 'phi4-mini':
+            chat_model = ChatOllama(model="phi4-mini", temperature=temp, max_tokens=max_num_tokens)
+        
+        else:
+            print(f"Model {model} is not supported. Skipping this row.")
+            continue
+
+        # attempt to generate chat response with retries for error handling
+        chat_response_content = "--"
+        chat_response_id = None
+        for attempt in range(retry_attempts):
+            try:
+                chat_response = chat_model.invoke(messages)
+                chat_response_content = chat_response.content
+                chat_response_id = chat_response.id
+                break
+            except Exception as e:
+                error_message = str(e)
+                if attempt == retry_attempts - 1:
+                    print(f"Failed after {retry_attempts} attempts for model {model} on index {index}. Error: {error_message}")
+                else:
+                    print(f"Attempt {attempt + 1} failed for model {model} on index {index}. Retrying in 30 seconds...")
+                    time.sleep(30)
+
+        # create the row with the desired columns
+        data_row = pd.DataFrame({
+            **{col: [expanded_df.loc[index, col]] for col in columns_to_keep},
+            'chat_model': [model],
+            'chat_date': [dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')],
+            'chat_replicate': [expanded_df.loc[index, 'replicate']],
+            'chat_response': [chat_response_content],
+            'chat_response_id': [chat_response_id]
+        })
+
+        # save to CSV if required
+        if not save_to_csv:
+            continue
+        elif not os.path.exists(output_file):
+            data_row.to_csv(output_file, index=False)
+        else:
+            existing_df = pd.read_csv(output_file)
+            updated_df = pd.concat([existing_df, data_row], ignore_index=True)
+            updated_df.to_csv(output_file, index=False)
+    
+    if not save_to_csv:
+        return chat_response_content
+
+```
+
+
+## A Custom Function for Extracting the LLM Labels {#custom_extract_labels}
+
+We created a custom function, `extract_classification`, to extract the classification labels from the chat completions generated by the LLMs. The function takes the chat response content and a list of valid words as input. It extracts the classification label from the chat response content based on the valid words provided. The function returns the extracted classification label if it matches any of the valid words; otherwise, it returns `NA`.
+
+```{r custom_extract_labels}
+extract_classification = function(text, valid_words) {
+  
+  # helper function to drop rows with unwanted words
+  drop_row = function(row) { 
+    all(is.na(row) | row == "classification.\n\ntemp")
+  }
+  
+  # preprocess the text
+  text = stringr::str_replace(text, "\\n<classification>", "\ntemp<classification>")
+  text = stringr::str_replace(text, "The classification is", "<classification>:")
+  text = stringr::str_replace_all(text, c(
+    "Slightly" = "", # Remove the word "slightly"
+    "clearly" = "",      # Remove the word "clearly"
+    '\\"' = "",          # Remove escaped quotes (\\")
+    '"' = ""             # Remove regular quotes (")
+  ))
+  
+  # define a regex pattern to match:
+  # 1. "\n\nclassification" with or without special characters or colons after it
+  # 2. "\n\n<classification>:" or "\n\n<classification>word</classification>"
+  matches = stringr::str_match_all(text, "(?i)(classification[^a-zA-Z]*:?\\s*\\w+|<classification>(\\w+)</classification>)")
+
+  # get the last match if it exists
+  if (length(matches[[1]]) > 0) {
+    if (nrow(matches[[1]]) > 1) {  
+      # Apply the function to filter out unwanted rows
+      matches[[1]] = matches[[1]][!apply(matches[[1]], 1, drop_row), , drop = FALSE]
+    }
+    first_match = head(matches[[1]], 1)
+    last_match = tail(matches[[1]], 1)
+    word = NA
+    word1 = NA
+    word2 = NA
+    # Handle the case for "<classification>word</classification>"
+    if (!is.na(first_match[, 3])) {
+      word = first_match[, 3]  # Extract word between <classification> and </classification>
+    }else if (!is.na(last_match[, 3])) {
+      word = last_match[, 3]
+    }else {
+      word1 = stringr::str_extract(first_match[, 1], "\\w+$")  # Otherwise, extract word after "classification"
+      word2 = stringr::str_extract(last_match[, 1], "\\w+$")
+    }
+    
+    # Check if the extracted word is in the valid_words list
+    if (tolower(word) %in% tolower(valid_words)) {
+      return(word)
+    } else if (tolower(word1) %in% tolower(valid_words)){
+      return(word1)
+    } else if (tolower(word2) %in% tolower(valid_words)){
+      return(word2)
+    } else {
+      return(NA)  # Return NA if the word is not in valid_words
+    }
+  } else {
+    return(NA)  # Return NA if no match is found
+  }
+}
+
+```
+
+## Custom Functions for Computing the Reliability Metrics {#custom_reliability_metrics}
+
+```{r compute_reliability_metrics}
+# Function to get summary statistics for mean percent agreement
+pa_summary = function(df, digits=4){
+  llm_models = unique(df$chat_model)
+  df_summary = data.frame(model = llm_models, mPa = rep(NA, length(llm_models)))
+  
+  for (i in 1:length(llm_models)){
+    m1 = df |> dplyr::filter(chat_model == llm_models[i])
+    df_summary[i,2] = paste0(
+      round(mean(m1$percent_agreement/100), digits), " (", 
+      round(sd(m1$percent_agreement/100), digits),   ")"
+      )
+  }
+  return(df_summary)
+}
+
+# function to compute the other reliability metrics
+# should contain one variable called chat_model,
+# and vars indicates variables for raters
+reliability_coefs = function(df, vars){
+  
+  df_coefs = data.frame(matrix(NA, ncol=9, nrow=42))
+  
+  colnames(df_coefs) = c("model", "coeff.name", "pa", "pe", "coeff.val", "coeff.se", "conf.int", "p.value", "w.name")
+  
+  llm_models = unique(df$chat_model)
+  
+  df_coefs$model = rep(llm_models, each=6)
+  
+  if (is.integer(vars)) vars = colnames(df)[vars]
+  
+  df_rates = df |>
+    dplyr::select(dplyr::all_of(c("chat_model", vars)))
+  
+  for (i in c(1, 7, 13, 19, 25, 31, 37)){
+    m1 = df_rates |>
+      dplyr::filter(chat_model == llm_models[ceiling(i/6)]) |>
+      dplyr::select(-chat_model)
+    
+    df_coefs[i,-1] = irrCAC::conger.kappa.raw(m1)$est
+    df_coefs[(i+1),-1] = irrCAC::fleiss.kappa.raw(m1)$est
+    df_coefs[(i+2),-1] = irrCAC::pa.coeff.raw(m1)$est
+    df_coefs[(i+3),-1] = irrCAC::gwet.ac1.raw(m1)$est
+    df_coefs[(i+4),-1] = irrCAC::bp.coeff.raw(m1)$est
+    df_coefs[(i+5),-1] = irrCAC::krippen.alpha.raw(m1)$est
+    
+  }
+  
+  return(df_coefs)
+  
+}
+
+```
+
+
+## Custom Functions to Compute Agreement with Gold Standard {#custom_agreement_functions}
+
+In the chunk below, we present two functions:  
+
+- `calculate_agreement`: This function calculates the agreement between the replicates and the gold standard. It takes the replicates and the gold standard as input and returns the agreement percentage. The function also has an optional parameter `na` to handle missing values. If `na = 0`, the function will not consider missing values in the calculation.  
+
+- `ensemble_reps`: This function ensembles the replicates by selecting the most common value. It takes the replicates as input and returns the most common value. The function also has an optional parameter `na` to handle missing values. If `na = 0`, the function will not consider missing values in the calculation. In case of ties, the function randomly selects one of the most common values.
+
+```{r compute_agreement_with_gold_standard}
+calculate_agreement = function(reps, ground_truth, na = 0) {
+  na_rm = dplyr::if_else(na == 0, T, F, missing = F)
+  
+  matches = sum(reps == ground_truth, na.rm = na_rm)
+  total_reps = length(reps)
+  agreement = matches / total_reps
+  
+  return(agreement)
+}
+
+# ensemble function to ensemble the replicates
+ensemble_reps = function(reps, na = 0){
+  
+  # handling of NAs
+  na_rm = dplyr::if_else(na == 0, "no", "ifany", missing = "ifany")
+  
+  # get the most common value
+  freq_table = table(reps, useNA = na_rm)
+  max_freq = max(freq_table)
+  most_common_values = names(freq_table)[freq_table == max_freq]
+  
+  # randomly select one of the most common values
+  most_common = sample(most_common_values, 1)
+  
+  return(most_common)
+
+}
+
+```
+
+
+# The Binary Classification Experiment {#binary_classification_exp}
+
+## Extracting the Full Dataset {#extract_full_dataset}
+
+We use the [stocknewsapi](https://stocknewsapi.com/) to extract articles related to the stock market. We crafted our request to get all tickers from January 05, 2025 to March 13, 2025. The data was pulled on March 14, 2025 at approximately 12:30 EDT. The resulting data frame was saved as a RDS file. To run the code below, you need to set the `stock_token` environment variable to your API token. In our case, we saved the token as an environment variable using the `usethis::edit_r_environ(scope = 'project')` function.
+
+```{r extract_stock_data, cache=TRUE, results='asis'}
+# pull the stock_api_token from the environment variable
+stock_api_token = Sys.getenv("stock_token")
+
+# crafting the request for the API
+request = paste0(
+  "https://stocknewsapi.com/api/v1/category?", # The base URL for the API
+  "section=alltickers", # We are interested in all tickers
+  "&sentiment=positive,negative", # We want non neutral sentiments
+  "&type=article", # We are interested in articles
+  "&items=100", # We want 100 items per page
+  "&date=01052025-03132025", # The date range
+  "&exchange=NYSE,NASDAQ", # We are interested in the NYSE and NASDAQ
+  "&country=USA", # We are interested in the USA
+  "&token=", stock_api_token, # The API token (ours is saved as an ENV Variable)
+  "&page=") # the pages that we will iterate over
+
+# crafting all requests
+all_requests = paste0(request, 1:100)
+
+# pulling the data from the API and cleaning the data prior to saving it
+stock_news_df = purrr::map_df(all_requests, ~jsonlite::fromJSON(.x)$data) |> 
+  # convert the topics and tickers cols into chr (they are lists of strings)
+  dplyr::mutate(tickers = purrr::map_chr(tickers, ~ paste(.x, collapse = ", "))) |> 
+  dplyr::mutate(topics = purrr::map_chr(topics, ~ paste(.x, collapse = ", "))) |> 
+  # convert the date column from character to datetime
+  dplyr::mutate(date = lubridate::dmy_hms(date, tz = "America/New_York"))
+
+# writing the data frame as RDS and CSV files
+readr::write_rds(stock_news_df, "../data/stock_news_data.rds")
+readr::write_csv(stock_news_df, "../data/stock_news_data.csv")
+```
+
+```{r get_column_names, include=FALSE}
+# This code chunk is used to get the column names of the stock_news_df data frame
+# it will be used to print the column names nicely in the text below
+# we do not want to show the code chunk in the final document and hence 
+# we set include=FALSE
+
+# Get column names
+column_names = names(stock_news_df)
+
+# Create a string with all column names except the last one
+all_but_last = paste(column_names[-length(column_names)], collapse = ", ")
+
+# Add the last column name with ", and " before it
+final_string = stringr::str_c(all_but_last, ", and ", column_names[length(column_names)])
+```
+
+The CSV file containing the stock news data can be accessed [here](https://github.com/fmegahed/llm_consistency/blob/main/data/stock_news_data.csv). The `stock_news_df` data frame contains `r scales::comma(nrow(stock_news_df))` rows and `r ncol(stock_news_df)` columns. The names of the columns are: `r final_string`. Furthermore, the sentiment of the articles is stored in the `sentiment` column. The sentiment of those articles is divided into two categories: `positive`, and `negative`. Their distribution is as follows:
+
+```{r sentiment_table, echo=FALSE, results='asis'}
+pander::pander(table(stock_news_df$sentiment), compact = TRUE)
+```
+
+## Downsampling the Binary Classification Dataset {#downsample_binary_classification}
+
+In this subsection, we filtered out rows with multiple `tickers` in the tickers column, keeping only rows with a single ticker (to ensure data quality). Additionally, we ensured the uniqueness of tickers during down sampling by selecting distinct tickers. 
+
+```{r downsample_binary_classification, results='asis'}
+set.seed(2025) # set the seed for reproducibility
+
+binary_data = stock_news_df |>
+  dplyr::filter(!stringr::str_detect(tickers, ",")) |> # keep rows without commas (i.e., single tickers)
+  dplyr::group_by(sentiment) |> # group by sentiment
+  dplyr::distinct(tickers, .keep_all = TRUE) |>  # keep unique tickers
+  # randomly select <=675 samples per sentiment class (will select all if n < 675)
+  dplyr::slice_sample(n = 675) |> 
+  dplyr::ungroup() # ungroup the data frame
+
+# save the downsampled dataset as RDS and CSV files
+readr::write_rds(binary_data, "../data/binary_classification_data.rds")
+readr::write_csv(binary_data, "../data/binary_classification_data.csv")
+```
+
+The resulting [binary classification dataset](https://github.com/fmegahed/llm_consistency/blob/main/data/binary_classification_data.csv) contains `r scales::comma(nrow(binary_data))` samples. The distribution of the sentiment classes is as follows: 
+
+```{r sentiment_table2, echo=FALSE, results='asis'}
+pander::pander(table(binary_data$sentiment), compact = TRUE)
+```
+
+```{r sample_tickers, include=FALSE}
+# This code chunk is used to get the unique tickers in the binary_data data frame
+# it will be used to print the unique tickers nicely in the text below
+
+set.seed(2025)  # set the seed for reproducibility
+
+# get the unique tickers
+unique_tickers = unique(binary_data$tickers)
+
+# get a sample of 5 tickers
+sample_tickers = sample(unique_tickers, size = 5)
+
+# get a random ticker that is not in the sample_tickers
+additional_ticker = setdiff(unique_tickers, sample_tickers) |> sample(size = 1)
+```
+
+
+
+## LLM-based Labeling {#llm_labeling_bin}
+
+### Prompt Construction {#prompt_construction_bin}
+
+For our labeling task, we defined a system prompt that combines *Chain of Thought* learning with *few-shot* learning. The system prompt provides instructions to the LLMs on how to categorize the impact of a news article on a stock's next-day return as either "Positive" or "Negative". The system prompt also includes simulated examples (involving Bitcoin which is not in our stock news dataset) to guide the LLMs in their classification task. Then, we defined a user prompt that presents the news article's title, full text, and the stock ticker symbol to the LLMs (these will be obtained from the CSV file). Both prompts are combined into a chat prompt template that will be used to interact with the LLMs.
+
+
+```{python llm_binary_setup, results='asis'}
+# define the system prompt for the categorization task
+bin_system_prompt = """
+Task: You will be provided with a news article's title, full text, and a stock ticker symbol. Categorize the impact of the news article on a stock's next-day return as either "Positive" or "Negative". 
+
+Instructions:
+1. Read the title and full text of the article.
+2. Analyze how the information might affect the company associated with the given ticker.
+3. Identify key factors such as financial performance, market trends, announcements, and industry developments that may influence investor sentiment.
+4. Assess the overall tone and its potential impact on the stock price.
+
+Classification Guidelines:
+- "Positive": News likely to increase the stock price.
+- "Negative": News likely to decrease the stock price.
+- Focus on the immediate impact (next day return).
+- Weigh the importance of positive vs. negative factors if the article is mixed.
+
+Output Format:
+- <analysis>: [Detailed analysis of the article’s impact]
+- <classification>: [Final classification: "Positive" or "Negative"]
+
+Note: Your classification must strictly be "Positive" or "Negative" based on the immediate expected impact.
+
+Examples:
+
+Example 1:
+Title: Bitcoin Surges as Major Financial Institution Announces BTC Adoption
+Text: In a groundbreaking move, a major financial institution announced that it would start offering Bitcoin as part of its investment portfolios. This decision is expected to significantly increase institutional demand for BTC, boosting investor confidence.
+Ticker: BTC
+<analysis>: The article highlights a major financial institution adopting Bitcoin, which is likely to enhance institutional investment and demand. This news positively affects investor sentiment and suggests an immediate positive impact on BTC's price.
+<classification>: Positive
+
+Example 2:
+Title: Bitcoin Faces Increased Regulatory Scrutiny Amid Fraud Concerns
+Text: Reports have emerged that several governments are planning to implement stricter regulations on cryptocurrency trading, citing concerns about fraud and market manipulation. The regulatory discussions have sparked debate among investors regarding the future of Bitcoin in heavily regulated markets.
+Ticker: BTC
+<analysis>: The article discusses potential regulatory actions that could negatively influence market sentiment by raising fears of restricted trading and heightened scrutiny. This news suggests a likely negative impact on BTC's price in the immediate term.
+<classification>: Negative
+"""
+
+# define the user input string template
+bin_user_prompt = """
+Here is the news article:
+
+<title>
+{title}
+</title>
+
+<text>
+{text}
+</text>
+
+The stock ticker symbol you need to consider is: {tickers}
+"""
+
+# create the chat prompt template
+bin_chat_prompt = ChatPromptTemplate.from_messages([
+    ("system", bin_system_prompt),
+    ("human", bin_user_prompt),
+])
+```
+
+
+
+
+### Labeling the Binary Classification Dataset {#labeling_bin}
+
+In this section, we will use the LLMs to label the sentiment of the news articles in our binary classification data set. We will use our `generalized_chat_completion` function to interact with the LLMs and generate chat completions for each news article. The chat completions will include the LLM's analysis and classification of the news article's impact on the stock's next-day return. We will run the labeling process for each LLM model and replicate the process three times to ensure consistency in the labeling results.
+
+```{python binary_labeling, cache=TRUE}
+res = generalized_chat_completion(
+  csv_path = '../data/binary_classification_data.csv',
+  columns_to_keep = ['date', 'title', 'text', 'tickers'],
+  models = models,
+  chat_prompt_template = bin_chat_prompt,
+  columns_for_chat_prompt = ['title', 'text', 'tickers'],
+  num_replicates = 5,
+  output_file = '../results/binary_classification_results.csv'
+  )
+```
+
+
+The labeling process has been completed for the binary classification data set. The results have been saved to a CSV file, which can be accessed [here](https://figshare.com/s/da5270e625ee605ffd44).
+
+
+### Extracting the LLM Labels and Creating a Data Frame for Analysis {#extract_llm_labels}
+
+In this section, we will extract the LLM labels from the binary classification results and create a data frame for further analysis. We will extract the LLM labels from the chat responses and create a new column in the data frame for each LLM model. We will also calculate the frequency of the most common label across replicates to assess the consistency of the LLMs.
+

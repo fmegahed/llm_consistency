@@ -1,0 +1,21 @@
+Version: 1.0
+ProjectId: 1a003d6f-8f3e-48b7-b611-8dae5c0f1020
+
+RestoreWorkspace: Default
+SaveWorkspace: Default
+AlwaysSaveHistory: Default
+
+EnableCodeIndexing: Yes
+UseSpacesForTab: Yes
+NumSpacesForTab: 2
+Encoding: UTF-8
+
+RnwWeave: Sweave
+LaTeX: pdfLaTeX
+
+MarkdownWrap: Column
+MarkdownWrapAtColumn: 72
+
+PythonType: conda
+PythonVersion: 3.12.9
+PythonPath: C:/ProgramData/anaconda3/envs/llmconst/python.exe

@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.env
+.Renviron
+.Rprofile
+results/binary_classification_results.csv
+rmarkdown/llm_consistency_cache/
