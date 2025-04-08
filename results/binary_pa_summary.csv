@@ -1,0 +1,15 @@
+model,mean_percent_agreement,sd_percent_agreement
+claude-3-5-haiku-20241022,0.985,0.105
+claude-3-7-sonnet-20250219,0.989,0.058
+command-r-plus-08-2024,0.971,0.098
+command-r7b,0.974,0.144
+deepseek-r1:1.5B,0.934,0.155
+deepseek-r1:7B,0.95,0.163
+gemma3:1B,0.971,0.14
+gemma3:27B,0.997,0.025
+gpt-4o-2024-11-20,0.979,0.077
+gpt-4o-mini-2024-07-18,0.983,0.071
+llama3.2:1B,0.986,0.088
+llama3.2:3B,0.934,0.227
+phi4-mini,0.932,0.223
+phi4:latest,0.994,0.033

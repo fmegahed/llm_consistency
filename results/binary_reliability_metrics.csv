@@ -1,0 +1,71 @@
+model,coeff.name,pa,pe,coeff.val,coeff.se,conf.int,p.value,w.name
+claude-3-5-haiku-20241022,Conger's Kappa,0.993,0.503,0.986,0.004,"(0.978,0.994)",0,unweighted
+claude-3-5-haiku-20241022,Fleiss' Kappa,0.993,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+claude-3-5-haiku-20241022,AC1,0.993,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+claude-3-5-haiku-20241022,Brennan-Prediger,0.993,0.5,0.986,0.004,"(0.978,0.994)",0,unweighted
+claude-3-5-haiku-20241022,Krippendorff's Alpha,0.993,0.503,0.986,0.003,"(0.98,0.992)",0,unweighted
+claude-3-7-sonnet-20250219,Conger's Kappa,0.993,0.503,0.986,0.004,"(0.978,0.994)",0,unweighted
+claude-3-7-sonnet-20250219,Fleiss' Kappa,0.993,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+claude-3-7-sonnet-20250219,AC1,0.993,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+claude-3-7-sonnet-20250219,Brennan-Prediger,0.993,0.5,0.986,0.004,"(0.978,0.994)",0,unweighted
+claude-3-7-sonnet-20250219,Krippendorff's Alpha,0.993,0.503,0.986,0.003,"(0.98,0.992)",0,unweighted
+command-r-plus-08-2024,Conger's Kappa,0.981,0.503,0.962,0.005,"(0.952,0.973)",0,unweighted
+command-r-plus-08-2024,Fleiss' Kappa,0.981,0.503,0.962,0.005,"(0.952,0.973)",0,unweighted
+command-r-plus-08-2024,AC1,0.981,0.497,0.963,0.005,"(0.953,0.973)",0,unweighted
+command-r-plus-08-2024,Brennan-Prediger,0.981,0.5,0.963,0.005,"(0.952,0.973)",0,unweighted
+command-r-plus-08-2024,Krippendorff's Alpha,0.981,0.503,0.962,0.005,"(0.952,0.973)",0,unweighted
+command-r7b,Conger's Kappa,0.957,0.507,0.914,0.008,"(0.898,0.929)",0,unweighted
+command-r7b,Fleiss' Kappa,0.957,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+command-r7b,AC1,0.957,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+command-r7b,Brennan-Prediger,0.957,0.5,0.915,0.008,"(0.9,0.93)",0,unweighted
+command-r7b,Krippendorff's Alpha,0.958,0.507,0.914,0.008,"(0.899,0.929)",0,unweighted
+deepseek-r1:1.5B,Conger's Kappa,0.992,0.504,0.984,0.005,"(0.974,0.994)",0,unweighted
+deepseek-r1:1.5B,Fleiss' Kappa,0.992,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+deepseek-r1:1.5B,AC1,0.992,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+deepseek-r1:1.5B,Brennan-Prediger,0.992,0.5,0.984,0.005,"(0.974,0.994)",0,unweighted
+deepseek-r1:1.5B,Krippendorff's Alpha,0.992,0.504,0.984,0.003,"(0.978,0.99)",0,unweighted
+deepseek-r1:7B,Conger's Kappa,0.927,0.504,0.853,0.01,"(0.835,0.872)",0,unweighted
+deepseek-r1:7B,Fleiss' Kappa,0.927,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+deepseek-r1:7B,AC1,0.927,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+deepseek-r1:7B,Brennan-Prediger,0.927,0.5,0.855,0.009,"(0.836,0.873)",0,unweighted
+deepseek-r1:7B,Krippendorff's Alpha,0.927,0.505,0.853,0.009,"(0.836,0.87)",0,unweighted
+gemma3:1B,Conger's Kappa,0.963,0.5,0.926,0.008,"(0.91,0.942)",0,unweighted
+gemma3:1B,Fleiss' Kappa,0.963,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+gemma3:1B,AC1,0.963,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+gemma3:1B,Brennan-Prediger,0.963,0.5,0.926,0.008,"(0.91,0.942)",0,unweighted
+gemma3:1B,Krippendorff's Alpha,0.963,0.5,0.926,0.006,"(0.913,0.938)",0,unweighted
+gemma3:27B,Conger's Kappa,0.963,0.5,0.926,0.008,"(0.91,0.942)",0,unweighted
+gemma3:27B,Fleiss' Kappa,0.963,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+gemma3:27B,AC1,0.963,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+gemma3:27B,Brennan-Prediger,0.963,0.5,0.926,0.008,"(0.91,0.942)",0,unweighted
+gemma3:27B,Krippendorff's Alpha,0.963,0.5,0.926,0.006,"(0.913,0.938)",0,unweighted
+gpt-4o-2024-11-20,Conger's Kappa,0.99,0.505,0.98,0.005,"(0.97,0.991)",0,unweighted
+gpt-4o-2024-11-20,Fleiss' Kappa,0.99,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+gpt-4o-2024-11-20,AC1,0.99,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+gpt-4o-2024-11-20,Brennan-Prediger,0.99,0.5,0.981,0.005,"(0.97,0.991)",0,unweighted
+gpt-4o-2024-11-20,Krippendorff's Alpha,0.99,0.505,0.98,0.003,"(0.974,0.987)",0,unweighted
+gpt-4o-mini-2024-07-18,Conger's Kappa,0.994,0.5,0.988,0.003,"(0.982,0.993)",0,unweighted
+gpt-4o-mini-2024-07-18,Fleiss' Kappa,0.994,0.5,0.988,0.003,"(0.982,0.993)",0,unweighted
+gpt-4o-mini-2024-07-18,AC1,0.994,0.5,0.988,0.003,"(0.982,0.993)",0,unweighted
+gpt-4o-mini-2024-07-18,Brennan-Prediger,0.994,0.5,0.988,0.003,"(0.982,0.993)",0,unweighted
+gpt-4o-mini-2024-07-18,Krippendorff's Alpha,0.994,0.5,0.988,0.003,"(0.982,0.993)",0,unweighted
+llama3.2:1B,Conger's Kappa,0.964,0.504,0.928,0.007,"(0.914,0.942)",0,unweighted
+llama3.2:1B,Fleiss' Kappa,0.964,0.504,0.928,0.007,"(0.914,0.942)",0,unweighted
+llama3.2:1B,AC1,0.964,0.496,0.929,0.007,"(0.916,0.943)",0,unweighted
+llama3.2:1B,Brennan-Prediger,0.964,0.5,0.928,0.007,"(0.915,0.942)",0,unweighted
+llama3.2:1B,Krippendorff's Alpha,0.964,0.504,0.928,0.007,"(0.915,0.942)",0,unweighted
+llama3.2:3B,Conger's Kappa,0.974,0.501,0.948,0.006,"(0.936,0.96)",0,unweighted
+llama3.2:3B,Fleiss' Kappa,0.974,0.501,0.948,0.006,"(0.936,0.96)",0,unweighted
+llama3.2:3B,AC1,0.974,0.499,0.948,0.006,"(0.936,0.96)",0,unweighted
+llama3.2:3B,Brennan-Prediger,0.974,0.5,0.948,0.006,"(0.936,0.96)",0,unweighted
+llama3.2:3B,Krippendorff's Alpha,0.975,0.501,0.949,0.006,"(0.937,0.961)",0,unweighted
+phi4-mini,Conger's Kappa,0.988,0.501,0.975,0.004,"(0.967,0.984)",0,unweighted
+phi4-mini,Fleiss' Kappa,0.988,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+phi4-mini,AC1,0.988,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+phi4-mini,Brennan-Prediger,0.988,0.5,0.976,0.004,"(0.967,0.984)",0,unweighted
+phi4-mini,Krippendorff's Alpha,0.988,0.501,0.975,0.004,"(0.968,0.983)",0,unweighted
+phi4:latest,Conger's Kappa,0.988,0.501,0.975,0.004,"(0.967,0.984)",0,unweighted
+phi4:latest,Fleiss' Kappa,0.988,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+phi4:latest,AC1,0.988,NA,NA,NA,"(NaN,NaN)",NA,unweighted
+phi4:latest,Brennan-Prediger,0.988,0.5,0.976,0.004,"(0.967,0.984)",0,unweighted
+phi4:latest,Krippendorff's Alpha,0.988,0.501,0.975,0.004,"(0.968,0.983)",0,unweighted

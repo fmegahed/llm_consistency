@@ -1,6 +1,6 @@
 miamired = '#C3142D'
 
-results = readr::read_csv("C:\\users\\megahefm\\desktop\\binary_classification_results.csv")
+results = readr::read_csv("../results/binary_classification_results.csv")
 
 
 
@@ -163,8 +163,6 @@ full_labels = c(model_labels, spacer_labels)
 full_labels = full_labels[model_levels]  # Reorder to match axis
 
 
-
-
 # plot:
 boxplot_df |>
   dplyr::mutate(chat_model = factor(chat_model, levels = model_levels)) |> 
@@ -223,8 +221,6 @@ boxplot_df |>
                     fontface = "bold",
                     size = 3
   ) +
-
-  
   ggplot2::labs(
     title = "Task Completion Time by Model",
     subtitle = "<span style='color:#808080'>Cheaper</span> vs. <span style='color:#C3142D'>more expensive (time, cost) </span> LLMs by company",

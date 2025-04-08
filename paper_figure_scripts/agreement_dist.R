@@ -21,7 +21,7 @@ mode_frequency = function(x, drop_na=F) {
 # * Getting the Data ------------------------------------------------------
 
 binary_classification_results = 
-  readr::read_csv("C:\\users\\megahefm\\desktop\\binary_analysis_df.csv") |> 
+  readr::read_csv("../results/binary_analysis_df.csv") |> 
   dplyr::select(
     date, title, tickers:rep_5
   ) |> 
@@ -72,7 +72,6 @@ model_abbrev = c(
   "claude-3-5-haiku-20241022" = "claude-3-5-haiku",
   "claude-3-7-sonnet-20250219"= "claude-3-7-sonnet"
 )
-
 
 
 # Apply alternating color span tags
