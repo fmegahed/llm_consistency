@@ -867,16 +867,34 @@ bin_chat_prompt = ChatPromptTemplate.from_messages([
 ])
 ```
 
+
+### Labeling the Binary Classification Dataset {#labeling_bin}
+
+In this section, we will use the LLMs to label the sentiment of the news articles in our binary classification data set. We will use our `generalized_chat_completion` function to interact with the LLMs and generate chat completions for each news article. The chat completions will include the LLM's analysis and classification of the news article's impact on the stock's next-day return. We will run the labeling process for each LLM model and replicate the process three times to ensure consistency in the labeling results.
+
+```{python binary_labeling, cache=TRUE, eval=FALSE}
+res = generalized_chat_completion(
+  csv_path = '../data/binary_classification_data.csv',
+  columns_to_keep = ['date', 'title', 'text', 'tickers'],
+  models = models,
+  chat_prompt_template = bin_chat_prompt,
+  columns_for_chat_prompt = ['title', 'text', 'tickers'],
+  num_replicates = 5,
+  output_file = '../results/binary_classification_results.csv'
+  )
+```
+
+
+The labeling process has been completed for the binary classification data set. The results have been saved to a CSV file, which can be accessed [here](https://figshare.com/s/da5270e625ee605ffd44).
+
 ### Task Completion Time by Model
 
 We present a detailed summary of inference latency performance across models below. 
 
-```{r not_read, include=FALSE}
-results = readr::read_csv("../results/binary_classification_results.csv")
-```
-
 ```{r time, class.source = 'fold-hide', message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
 # * Summary Table ---------------------------------------------------------
+
+results = readr::read_csv("../results/binary_classification_results.csv")
 
 results |>  
   dplyr::filter(chat_model != 'exaone-deep:2.4b') |> 
@@ -1101,27 +1119,6 @@ boxplot_df |>
     axis.ticks.y = ggplot2::element_blank()
   )
 ```
-
-
-
-### Labeling the Binary Classification Dataset {#labeling_bin}
-
-In this section, we will use the LLMs to label the sentiment of the news articles in our binary classification data set. We will use our `generalized_chat_completion` function to interact with the LLMs and generate chat completions for each news article. The chat completions will include the LLM's analysis and classification of the news article's impact on the stock's next-day return. We will run the labeling process for each LLM model and replicate the process three times to ensure consistency in the labeling results.
-
-```{python binary_labeling, cache=TRUE, eval=FALSE}
-res = generalized_chat_completion(
-  csv_path = '../data/binary_classification_data.csv',
-  columns_to_keep = ['date', 'title', 'text', 'tickers'],
-  models = models,
-  chat_prompt_template = bin_chat_prompt,
-  columns_for_chat_prompt = ['title', 'text', 'tickers'],
-  num_replicates = 5,
-  output_file = '../results/binary_classification_results.csv'
-  )
-```
-
-
-The labeling process has been completed for the binary classification data set. The results have been saved to a CSV file, which can be accessed [here](https://figshare.com/s/da5270e625ee605ffd44).
 
 
 ### Extracting the LLM Labels and Creating a Data Frame for Analysis {#extract_llm_labels}
@@ -2570,11 +2567,6 @@ binary_gold_df =
 news_effect_table = 
   table(binary_gold_df$leading_news_effect, useNA = "ifany") / 14
 
-# extract the NA tickers (assuming tickers are in the same dataframe)
-na_tickers = binary_gold_df |> 
-  dplyr::filter(is.na(leading_news_effect)) |> 
-  dplyr::pull(tickers) |> 
-  unique()
 
 # explanation with cat
 cat(
@@ -2582,8 +2574,7 @@ cat(
   "\n\nNegative news effect count per model:", news_effect_table["Negative"],
   "\nPositive news effect count per model:", news_effect_table["Positive"],
   "\nMissing or NA values per model:", news_effect_table[3],
-  "\n\nThe missing or NA values are likely due to the fact that we could not retrieve stock prices for certain tickers from the Yahoo Finance API, possibly because they represent private stocks. The tickers associated with these missing values are:\n",
-  paste(na_tickers, collapse = ", ")
+  "\n\nThe missing or NA values are likely due to the fact that we could not retrieve stock prices for certain tickers, possibly because they represent private stocks."
 )
 
 ```
