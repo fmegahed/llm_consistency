@@ -47,7 +47,7 @@ names(model_labels) <- model_abbrev[chat_models]
 
 
 # ---- Load Data ----
-intra_df = readr::read_csv("C:\\users\\megahefm\\downloads\\binary_reliability_metrics.csv") |>
+intra_df = readr::read_csv("../results/binary_reliability_metrics.csv") |>
   dplyr::mutate(
     lower_ci = coeff.val - stats::qnorm(0.975) * coeff.se,
     upper_ci = coeff.val + stats::qnorm(0.975) * coeff.se,
@@ -205,4 +205,4 @@ final_plot <- cowplot::ggdraw() +
 final_plot
 
 
-ggplot2::ggsave("C:\\users\\megahefm\\downloads\\intra_dist.pdf", width = 4.5, height = 6.5)
+ggplot2::ggsave("../figs/intra_dist.pdf", width = 4.5, height = 6.5)

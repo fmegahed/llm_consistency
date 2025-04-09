@@ -33,6 +33,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
 # Preface {-}
 
 In this project, we utilize the open-source `r fontawesome::fa(name = "r-project", fill = "steelblue")` programming language, alongside Python, to evaluate the consistency of large language models (LLMs) through intra- and inter-reliability methods. For `r fontawesome::fa(name = "r-project", fill = "steelblue")`, we are using *version 4.4.2 (2024-10-31 ucrt)*, and we manage package dependencies with `renv`. The `renv` package allows for isolated project environments, ensuring the same versions of `r fontawesome::fa(name = "r-project", fill = "steelblue")` packages are used consistently. If you're new to `renv`, it enables the creation of "snapshots" for package versions, ensuring reproducibility across different systems. You can find all package versions used in this project in our `renv` repository at [this link](https://github.com/fmegahed/llm_constitency/tree/main/renv).
@@ -61,7 +62,7 @@ All input and output files for this project can be accessed and downloaded from 
 
 The minimum sample size for each of our experiments was computed for: **simple percent agreement**, **Gwet's AC1 coefficient**, and **Brennan-Prediger coefficient**. The minimum sample size was computed using the tables in [Handbook of Inter-Rater Reliability, 5th Edition. Volume 1: Analysis of Categorical Ratings](https://sites.fastspring.com/agreestat/instant/cac5ed978_1_7923_5463_2e). The sample sizes were computed for the three different metrics, with a margin of error of 0.05, a confidence level of 0.90, and for five replicates.
 
-```{r binary_classification_sample_size, echo=FALSE, results='asis'}
+```{r binary_classification_sample_size, class.source = 'fold-hide', results='asis'}
 # create a data frame of the obtained sample size results
 binary_data = data.frame(
   metric = c("Percent Agreement", "Gwet’s AC1 Coefficient", "Brennan-Prediger Coefficient"),
@@ -762,7 +763,7 @@ all_but_last = paste(column_names[-length(column_names)], collapse = ", ")
 final_string = stringr::str_c(all_but_last, ", and ", column_names[length(column_names)])
 ```
 
-The CSV file containing the stock news data can be accessed [here](https://github.com/fmegahed/llm_consistency/blob/main/data/stock_news_data.csv). The `stock_news_df` data frame contains `r scales::comma(nrow(stock_news_df))` rows and `r ncol(stock_news_df)` columns. The names of the columns are: `r final_string`. Furthermore, the sentiment of the articles is stored in the `sentiment` column. The sentiment of those articles is divided into two categories: `positive`, and `negative`. Their distribution is as follows:
+The CSV file containing the stock news data can be accessed [here](https://github.com/fmegahed/llm_consistency/blob/master/data/stock_news_data.csv). The `stock_news_df` data frame contains `r scales::comma(nrow(stock_news_df))` rows and `r ncol(stock_news_df)` columns. The names of the columns are: `r final_string`. Furthermore, the sentiment of the articles is stored in the `sentiment` column. The sentiment of those articles is divided into two categories: `positive`, and `negative`. Their distribution is as follows:
 
 ```{r sentiment_table, echo=FALSE, results='asis'}
 pander::pander(table(stock_news_df$sentiment), compact = TRUE)
@@ -788,28 +789,13 @@ readr::write_rds(binary_data, "../data/binary_classification_data.rds")
 readr::write_csv(binary_data, "../data/binary_classification_data.csv")
 ```
 
-The resulting [binary classification dataset](https://github.com/fmegahed/llm_consistency/blob/main/data/binary_classification_data.csv) contains `r scales::comma(nrow(binary_data))` samples. The distribution of the sentiment classes is as follows: 
+The resulting [binary classification dataset](https://github.com/fmegahed/llm_consistency/blob/master/data/binary_classification_data.csv) 
+
+contains `r scales::comma(nrow(binary_data))` samples. The distribution of the sentiment classes is as follows: 
 
 ```{r sentiment_table2, echo=FALSE, results='asis'}
 pander::pander(table(binary_data$sentiment), compact = TRUE)
 ```
-
-```{r sample_tickers, include=FALSE}
-# This code chunk is used to get the unique tickers in the binary_data data frame
-# it will be used to print the unique tickers nicely in the text below
-
-set.seed(2025)  # set the seed for reproducibility
-
-# get the unique tickers
-unique_tickers = unique(binary_data$tickers)
-
-# get a sample of 5 tickers
-sample_tickers = sample(unique_tickers, size = 5)
-
-# get a random ticker that is not in the sample_tickers
-additional_ticker = setdiff(unique_tickers, sample_tickers) |> sample(size = 1)
-```
-
 
 
 ## LLM-based Labeling {#llm_labeling_bin}
@@ -883,11 +869,13 @@ bin_chat_prompt = ChatPromptTemplate.from_messages([
 
 ### Task Completion Time by Model
 
+We present a detailed summary of inference latency performance across models below. 
+
 ```{r not_read, include=FALSE}
 results = readr::read_csv("../results/binary_classification_results.csv")
 ```
 
-```{r time, echo=FALSE}
+```{r time, class.source = 'fold-hide', message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
 # * Summary Table ---------------------------------------------------------
 
 results |>  
@@ -1208,7 +1196,13 @@ The analysis dataframe for the binary classification experiment has been created
 
 ### Distribution of LLMs for Binary Classification
 
-```{r LLM_labels_distribution, echo=FALSE, message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
+In this section, we study the distribution of LLM labels for binary classification. The figure below, the "invalid" label represents the inconsistency between our prompt (which explicitly instructed the LLM to restrict its classification to either "positive" or "negative") and the generated classification, which sometimes included terms such as "neutral" or "unsure".
+
+
+```{r LLM_labels_distribution, class.source = 'fold-hide', message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
+
+# library(tidyverse)
+
 # * Getting the Data ------------------------------------------------------
 miamired = '#C3142D'
 binary_classification_results = 
@@ -1324,10 +1318,17 @@ patchwork::wrap_plots(plots, ncol = 2, axis_titles ='collect') +
 ```
 
 
+## Reliability Assessment
+
+In this section, we conduct the reliability assessment. 
 
 ### Distribution of NA-Penalized Agreement Across Articles by LLM
 
-```{r distribution_NA_penalized, echo=FALSE, message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
+The figure below shows the NA-penalized agreement distributions for each model, highlighting the percentage of articles where all five replicates generated identical classifications. The NA-penalty reflects how we count agreement in the presence of invalid responses, where NAs are ignored in the numerator but are kept in the denominator. 
+
+
+```{r distribution_NA_penalized, class.source = 'fold-hide', message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
+# library(tidyverse)
 miamired = '#C3142D'
 
 chat_model_colors = rep(c('#808080', '#C3142D'), 7)
@@ -1529,7 +1530,8 @@ cowplot::ggdraw() +
 
 ### Computing the Reliability Metrics {#compute_reliability_metrics_bin}
 
-```{r binary_reliability_metrics, results='asis', message=FALSE}
+
+```{r binary_reliability_metrics, results='asis', message=FALSE, warning=FALSE}
 pacman::p_load(irrCAC, stringr, tidyverse)
 binary_analysis_df <- readr::read_csv("../results/binary_analysis_df.csv")
 
@@ -1631,7 +1633,10 @@ The CSV files containing the reliability metrics for the binary classification e
 
 ### Intra-LLM Reliability
 
-```{r intra_llm, echo=FALSE, message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
+In this section, we study the chance-adjusted reliability coefficient estimates (dots) and their \v{S}id\'{a}k-adjusted confidence intervals (whiskers), constructed to maintain 90% family-wise confidence within each cost group. 
+
+```{r intra_llm, class.source = 'fold-hide', message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
+# library(tidyverse)
 library(grid)
 library(gridExtra)
 
@@ -1843,9 +1848,10 @@ final_plot
 
 ### Inter-Rater Reliability among LLMs
 
-We study the inter-rater reliability among all models. 
+After confirming strong internal consistency within individual models, we examine agreement between different LLMs. Instead of analyzing all possible combinations within each group, we focus on top-N combinations ranked by Krippendorff's Alpha, with N ranging from 2 to 7.   
 
-```{r inter_llm, echo=FALSE, message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
+```{r inter_llm, class.source = 'fold-hide', message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
+
 # ---- Setup ----
 chat_models = c(
   "Top 2 Cheaper",
@@ -2160,9 +2166,9 @@ readr::write_csv(validity_df, "../results/binary_sens_validity_df.csv")
 
 ### Visualizing the Validity Metrics
 
-The validity metrics for the binary classification experiment are visualized in the plots below.
+We report accuracy, true positive rate, true negative rate, positive predictive value, and F1 score to provide a comprehensive performance. The figure below shows the LLM classification performance v.s. gold standard (those obtained from the `StockNewsAPI`). The dot represents each metric's mean value (from its intra-rater five replicates), and the whiskers length reflect the standard error.   
 
-```{r validity_StockNewsAPI, echo=FALSE, message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
+```{r validity_StockNewsAPI, class.source = 'fold-hide', message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
 # ---- Setup ----
 chat_models = c(
   "phi4-mini",
@@ -2585,10 +2591,13 @@ cat(
 
 ### Visualizing the Validity Metrics 
 
-The validity metrics for the binary classification experiment are visualized in the plots below.
+The comparison against actual market behavior, depicted in the figure below, contrasts the gold standard results. The dot represents each metric's mean value (from its intra-rater five replicates), and the whiskers length reflect the standard error. 
 
+```{r validity_SP500, class.source = 'fold-hide', message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
+# library(tidyverse)
+# library(grid)
+# library(gridExtra)
 
-```{r validity_SP500, echo=FALSE, message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
 # ---- Setup ----
 chat_models = c(
   "phi4-mini",

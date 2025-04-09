@@ -3,7 +3,6 @@ sample_size_fn = function(alpha, margin_of_error, c_inverse = NULL, a = NULL, b 
   
   critical_value = qnorm(1-(alpha/2))
   
-  # based on Tessa's notes in P.213
   if(fleiss == F){
     sample_size = (critical_value^2)/(c_inverse * (margin_of_error^2))
   }else{
@@ -33,7 +32,7 @@ sample_size_fn(alpha = (1-.9^(1/7)), margin_of_error = 0.05,
 
 
 
-# * Fadel's Plot ----------------------------------------------------------
+# * Plot ----------------------------------------------------------
 my_red = '#C3142D'
 my_gray = '#808080'
 

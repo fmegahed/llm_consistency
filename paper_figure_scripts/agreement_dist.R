@@ -239,4 +239,4 @@ patchwork::wrap_plots(plot_list, ncol = 2, axis_titles ='collect', axes = 'keep'
     )
   )
 
-ggplot2::ggsave("C:\\users\\megahefm\\downloads\\agreement_dist.pdf", width = 4.5, height = 6.5)
+ggplot2::ggsave("../figs/agreement_dist.pdf", width = 4.5, height = 6.5)

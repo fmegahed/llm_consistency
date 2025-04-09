@@ -215,4 +215,4 @@ final_plot <- cowplot::ggdraw() +
 final_plot
 
 
-ggplot2::ggsave("C:\\users\\megahefm\\downloads\\ground_truth.pdf", width = 4.5, height = 6.5)
+ggplot2::ggsave("../figs/ground_truth.pdf", width = 4.5, height = 6.5)

@@ -243,8 +243,8 @@ boxplot_df |>
     axis.ticks.y = ggplot2::element_blank()
   )
 
-ggplot2::ggsave("C:\\users\\megahefm\\downloads\\time_diff_boxplot.pdf", width = 4.5, height = 6)
-ggplot2::ggsave("C:\\users\\megahefm\\downloads\\time_diff_boxplot_wide.pdf", width = 6.5, height = 6.5)
+ggplot2::ggsave("../figs/time_diff_boxplot.pdf", width = 4.5, height = 6)
+ggplot2::ggsave("../figs/time_diff_boxplot_wide.pdf", width = 6.5, height = 6.5)
 
 
 

@@ -1,7 +1,7 @@
 library(gridExtra, tidyverse)
 source("all_functions.R")
 
-binary_analysis_df <- read_csv("../results/../results/binary_analysis_df.csv")
+binary_analysis_df <- read_csv("../results/binary_analysis_df.csv")
 
 df_long <- binary_analysis_df %>%
   pivot_longer(cols = starts_with("rep"), names_to = "rep", values_to = "value")

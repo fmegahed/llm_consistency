@@ -118,5 +118,5 @@ patchwork::wrap_plots(plots, ncol = 2, axis_titles ='collect') +
     )
   )
 
-ggplot2::ggsave("C:\\users\\megahefm\\downloads\\label_dist.pdf", width = 4.5, height = 6)
+ggplot2::ggsave("../figs/label_dist.pdf", width = 4.5, height = 6)
 
