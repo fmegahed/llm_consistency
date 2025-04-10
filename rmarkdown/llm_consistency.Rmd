@@ -884,8 +884,7 @@ res = generalized_chat_completion(
   )
 ```
 
-
-The labeling process has been completed for the binary classification data set. The results have been saved to a CSV file, which can be accessed [here](https://figshare.com/s/da5270e625ee605ffd44).
+The labeling process has been completed for the binary classification data set. The results have been saved to a CSV file, **binary_classification_results.csv**, which can be accessed [here](https://figshare.com/s/da5270e625ee605ffd44).
 
 ### Task Completion Time by Model
 
