@@ -671,7 +671,7 @@ In the chunk below, we present two functions:
 
 - `ensemble_reps`: This function ensembles the replicates by selecting the most common value. It takes the replicates as input and returns the most common value. The function also has an optional parameter `na` to handle missing values. If `na = 0`, the function will not consider missing values in the calculation. In case of ties, the function randomly selects one of the most common values.
 
-```{r compute_agreement_with_benchmark}
+```{r compute_agreement_with_gold_standard}
 calculate_agreement = function(reps, ground_truth, na = 0) {
   na_rm = dplyr::if_else(na == 0, T, F, missing = F)
   
@@ -880,7 +880,8 @@ res = generalized_chat_completion(
   )
 ```
 
-The labeling process has been completed for the binary classification data set. The results have been saved to a CSV file, **binary_classification_results.csv**, which can be accessed [here](https://figshare.com/s/da5270e625ee605ffd44).
+
+The labeling process has been completed for the binary classification data set. The results have been saved to a CSV file, which can be accessed [here](https://figshare.com/s/da5270e625ee605ffd44).
 
 ### Task Completion Time by Model
 
@@ -2381,24 +2382,10 @@ final_plot
 
 ## Validity of the Binary Classification Labels (Comparison with "External Criterion" Impacts) {#validity_bin_gold}
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-In this section, we will repeat our analysis from the previous section, but this time we will compare the LLM labels with the "external criterion" effects to what actually happened to the stock prices. We will calculate the agreement between the LLM labels and the "external criterion" labels using our agreement metrics.
-
-
-### Extracting the Stock Performance
-=======
 In this section, we will repeat our analysis from the previous section, but this time we will compare the LLM labels with the "External Criterion" effects to what actually happened to the stock prices. We will calculate the agreement between the LLM labels and the "External Criterion" labels using our agreement metrics.
 
 
 ### Extracting the External Criterion Stock Performance
->>>>>>> Stashed changes
-=======
-In this section, we will repeat our analysis from the previous section, but this time we will compare the LLM labels with the "External Criterion" effects to what actually happened to the stock prices. We will calculate the agreement between the LLM labels and the "External Criterion" labels using our agreement metrics.
-
-
-### Extracting the External Criterion Stock Performance
->>>>>>> Stashed changes
 
 In the code chunk below, we use R and the `tidyquant` package to extract the stock prices for the tickers associated with the binary classification labels. We then save the raw stock prices to a CSV file for further analysis.
 
@@ -2409,7 +2396,7 @@ tickers_df = readr::read_csv(
 
 tickers_list = tickers_df$tickers |> unique()
 min_date = min(tickers_df$date)
-max_date = max(tickers_df$date) + days(3)
+max_date = max(tickers_df$date)
 
 
 stock_prices = tidyquant::tq_get(
@@ -2514,7 +2501,7 @@ adjusted_news_df =
 
 # NYSE holidays within the date range
 min_date = min(adjusted_news_df$date) |> as.Date()
-max_date = max(adjusted_news_df$date) |> as.Date() + days(3)
+max_date = max(adjusted_news_df$date) |> as.Date()
 
 # nyse holidays within our range dates
 nyse_holidays = 
@@ -2560,9 +2547,12 @@ binary_gold_df =
     day_of_week = lubridate::wday(date, label = TRUE, abbr = FALSE),
     impact_date = date,  # set impact_date as original date first
     # if it's a holiday or weekend, pick the next available trading day
-    impact_date =  
-      purrr::map_dbl(date, ~ next_trading_day(.x, trading_days)) |> as.Date()
-) |> 
+    impact_date = dplyr::if_else(
+      date %in% off_dates, 
+      purrr::map_dbl(date, ~ next_trading_day(.x, trading_days)) |> as.Date(),  
+      impact_date  # Keep original date if not a weekend/holiday
+    )
+  ) |> 
   # left join with returns_df using the adjusted impact_date
   dplyr::left_join(
     returns_df |> dplyr::select(date, ticker, leading_news_effect),
@@ -2647,22 +2637,6 @@ names(model_labels) <- model_abbrev[chat_models]
 inter_df = 
   tibble::tribble(
     ~Model,             ~Accuracy, ~Acc_SE, ~TPR,    ~TPR_SE, ~TNR,    ~TNR_SE, ~PPV,    ~PPV_SE, ~F1,    ~F1_SE,
-<<<<<<< Updated upstream
-    "phi4-mini",        0.485,     0.001,   0.492,   0.004,   0.478,   0.002,   0.497,   0.001,  0.495,   0.002,
-    "phi4:latest",      0.514,     0.002,   0.526,   0.001,   0.501,   0.004,   0.525,   0.002,  0.525,   0.001,
-    "llama3.2:1B",      0.526,     0.001,   0.540,   0.000,   0.511,   0.003,   0.536,   0.002,  0.538,   0.001,
-    "llama3.2:3B",      0.490,     0.000,   0.539,   0.005,   0.438,   0.005,   0.501,   0.000,  0.520,   0.002,
-    "gemma3:1B",        0.511,     0.001,   0.462,   0.007,   0.563,   0.005,   0.525,   0.001,  0.491,   0.005,
-    "gemma3:27B",       0.517,     0.002,   0.514,   0.001,   0.521,   0.004,   0.530,   0.002,  0.522,   0.001,
-    "deepseek-r1:1.5B", 0.512,     0.003,   0.465,   0.007,   0.562,   0.001,   0.527,   0.003,  0.494,   0.005,
-    "deepseek-r1:7B",   0.514,     0.002,   0.522,   0.003,   0.506,   0.001,   0.525,   0.002,  0.524,   0.002,
-    "command-r-plus",   0.513,     0.004,   0.451,   0.004,   0.577,   0.005,   0.528,   0.004,  0.487,   0.004,
-    "command-r7b",      0.514,     0.001,   0.557,   0.003,   0.469,   0.001,   0.524,   0.001,  0.540,   0.002,
-    "gpt-4o",           0.509,     0.005,   0.462,   0.008,   0.558,   0.007,   0.523,   0.005,  0.491,   0.006,
-    "gpt-4o-mini",      0.516,     0.003,   0.496,   0.005,   0.537,   0.004,   0.529,   0.003,  0.512,   0.004,
-    "claude-3-5-haiku", 0.515,     0.003,   0.550,   0.005,   0.478,   0.001,   0.525,   0.002,  0.537,   0.004,
-    "claude-3-7-sonnet",0.516,     0.002,   0.549,   0.004,   0.482,   0.002,   0.526,   0.002,  0.537,   0.003
-=======
     "phi4-mini",        0.487,     0.002,   0.495,   0.002,   0.479,   0.006,   0.485,   0.002,  0.490,   0.000,
     "phi4:latest",      0.513,     0.003,   0.526,   0.001,   0.500,   0.004,   0.511,   0.003,  0.518,   0.002,
     "llama3.2:1B",      0.512,     0.000,   0.527,   0.001,   0.497,   0.001,   0.510,   0.000,  0.518,   0.000,
@@ -2677,7 +2651,6 @@ inter_df =
     "gpt-4o",           0.509,     0.002,   0.461,   0.007,   0.558,   0.005,   0.508,   0.002,  0.483,   0.004,
     "claude-3-5-haiku", 0.512,     0.003,   0.549,   0.006,   0.476,   0.002,   0.509,   0.003,  0.528,   0.004,
     "claude-3-7-sonnet",0.514,     0.003,   0.548,   0.005,   0.480,   0.002,   0.511,   0.002,  0.529,   0.004
->>>>>>> Stashed changes
   )
 
 inter_df = inter_df |> 
@@ -2778,15 +2751,7 @@ table_grob$heights <- ggplot2::unit(rep(1, nrow(table_grob)), "lines") * 0.5
 
 # Add title row
 title_grob <- grid::textGrob(
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  "Validity with external criterion",
-=======
   "Validity with External Criterion",
->>>>>>> Stashed changes
-=======
-  "Validity with External Criterion",
->>>>>>> Stashed changes
   gp = grid::gpar(fontface = "bold", fontsize = 9),
   x = 0.5, hjust = 0.5
 )
