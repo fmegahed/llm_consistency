@@ -1,5 +1,3 @@
-# LLM Consistency: Evaluating Intra- and Inter-Rater Reliability of Large Language Models
-
 ## Overview
 
 This repository provides a comprehensive framework for assessing the consistency and validity of multiple large language models (LLMs) on binary classification and sentiment-labeling tasks. Our workflow includes:
