@@ -2382,10 +2382,17 @@ final_plot
 ## Validity of the Binary Classification Labels (Comparison with "External Criterion" Impacts) {#validity_bin_gold}
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 In this section, we will repeat our analysis from the previous section, but this time we will compare the LLM labels with the "external criterion" effects to what actually happened to the stock prices. We will calculate the agreement between the LLM labels and the "external criterion" labels using our agreement metrics.
 
 
 ### Extracting the Stock Performance
+=======
+In this section, we will repeat our analysis from the previous section, but this time we will compare the LLM labels with the "External Criterion" effects to what actually happened to the stock prices. We will calculate the agreement between the LLM labels and the "External Criterion" labels using our agreement metrics.
+
+
+### Extracting the External Criterion Stock Performance
+>>>>>>> Stashed changes
 =======
 In this section, we will repeat our analysis from the previous section, but this time we will compare the LLM labels with the "External Criterion" effects to what actually happened to the stock prices. We will calculate the agreement between the LLM labels and the "External Criterion" labels using our agreement metrics.
 
@@ -2772,7 +2779,11 @@ table_grob$heights <- ggplot2::unit(rep(1, nrow(table_grob)), "lines") * 0.5
 # Add title row
 title_grob <- grid::textGrob(
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   "Validity with external criterion",
+=======
+  "Validity with External Criterion",
+>>>>>>> Stashed changes
 =======
   "Validity with External Criterion",
 >>>>>>> Stashed changes
