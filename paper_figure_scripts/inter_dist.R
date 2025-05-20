@@ -62,7 +62,7 @@ names(model_labels) <- model_abbrev[chat_models]
 
 
 # ---- Load Data ----
-intra_df = read_csv("../results/binary_reliability_metrics.csv") %>% 
+intra_df = read_csv("./results/binary_reliability_metrics.csv") %>% 
   filter(coeff.name == "Krippendorff's Alpha") %>% 
   select(model, coeff.val, coeff.se)
 
@@ -80,7 +80,7 @@ intra_df <- intra_df %>%
   select(cost, everything()) %>% 
   arrange(cost, desc(coeff.val))
 
-binary_analysis_df <- read_csv("../results/binary_analysis_df.csv")
+binary_analysis_df <- read_csv("./results/binary_analysis_df.csv")
 
 df_long <- binary_analysis_df %>%
   pivot_longer(cols = starts_with("rep"), names_to = "rep", values_to = "value")
@@ -284,4 +284,4 @@ final_plot <- cowplot::ggdraw() +
 final_plot
 
 
-ggplot2::ggsave("../figs/inter_dist.pdf", plot=final_plot, width = 5.5, height = 6.5)
+ggplot2::ggsave("./figs/inter_dist.pdf", plot=final_plot, width = 5.5, height = 6.5)

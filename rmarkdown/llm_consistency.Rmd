@@ -650,7 +650,7 @@ reliability_coefs = function(df, vars){
   
   for (i in seq(1, 5*no_models, by=5)){
     m1 = df_rates |>
-      dplyr::filter(chat_model == llm_models[ceiling(i/6)]) |>
+      dplyr::filter(chat_model == llm_models[ceiling(i/5)]) |>
       dplyr::select(-chat_model)
     df_coefs[i,-1] = irrCAC::conger.kappa.raw(m1)$est
     df_coefs[(i+1),-1] = irrCAC::fleiss.kappa.raw(m1)$est
@@ -667,15 +667,15 @@ reliability_coefs = function(df, vars){
 ```
 
 
-## Custom Functions to Compute Agreement with Gold Standard {#custom_agreement_functions}
+## Custom Functions to Compute Agreement with Benchmark {#custom_agreement_functions}
 
 In the chunk below, we present two functions:  
 
-- `calculate_agreement`: This function calculates the agreement between the replicates and the gold standard. It takes the replicates and the gold standard as input and returns the agreement percentage. The function also has an optional parameter `na` to handle missing values. If `na = 0`, the function will not consider missing values in the calculation.  
+- `calculate_agreement`: This function calculates the agreement between the replicates and the benchmark. It takes the replicates and the benchmark as input and returns the agreement percentage. The function also has an optional parameter `na` to handle missing values. If `na = 0`, the function will not consider missing values in the calculation.  
 
 - `ensemble_reps`: This function ensembles the replicates by selecting the most common value. It takes the replicates as input and returns the most common value. The function also has an optional parameter `na` to handle missing values. If `na = 0`, the function will not consider missing values in the calculation. In case of ties, the function randomly selects one of the most common values.
 
-```{r compute_agreement_with_gold_standard}
+```{r compute_agreement_with_benchmark}
 calculate_agreement = function(reps, ground_truth, na = 0) {
   na_rm = dplyr::if_else(na == 0, T, F, missing = F)
   
@@ -2131,7 +2131,7 @@ final_plot
 
 ## Validity of the Binary Classification Labels (Comparison with "StockNewsAPI" Labels)
 
-In this section, we will compare the LLM labels with the labels provided by the StockNewsAPI (**gold standard**). We will calculate the agreement between the LLM labels and the "gold standard" labels using various reliability metrics. We will also assess the validity of the LLM labels by comparing them with the "gold standard" labels.
+In this section, we will compare the LLM labels with the labels provided by the StockNewsAPI (**benchmark**). We will calculate the agreement between the LLM labels and the "benchmark" labels using various reliability metrics. We will also assess the validity of the LLM labels by comparing them with the "benchmark" labels.
 
 ```{r binary_sens_classification_validity, results='hold', message=FALSE}
 stock_sentiment_df = readr::read_csv("../data/binary_classification_data.csv") |> 
@@ -2141,7 +2141,7 @@ validity_df =
   readr::read_csv("../results/binary_analysis_df.csv") |> 
   dplyr::select(-percent_agreement) |> 
   dplyr::left_join(stock_sentiment_df, by = c("date", "title", "text", "tickers")) |> 
-  # percent of rep_1, rep_2, .., agreement with the gold standard
+  # percent of rep_1, rep_2, .., agreement with the benchmark
   dplyr::rowwise() |>
   dplyr::mutate(
     agreement_na_penalty = calculate_agreement(
@@ -2162,7 +2162,7 @@ readr::write_csv(validity_df, "../results/binary_sens_validity_df.csv")
 
 ### Visualizing the Validity Metrics
 
-We report accuracy, true positive rate, true negative rate, positive predictive value, and F1 score to provide a comprehensive performance. The figure below shows the LLM classification performance v.s. gold standard (those obtained from the `StockNewsAPI`). The dot represents each metric's mean value (from its intra-rater five replicates), and the whiskers length reflect the standard error.   
+We report accuracy, true positive rate, true negative rate, positive predictive value, and F1 score to provide a comprehensive performance. The figure below shows the LLM classification performance v.s. benchmark (those obtained from the `StockNewsAPI`). The dot represents each metric's mean value (from its intra-rater five replicates), and the whiskers length reflect the standard error.   
 
 ```{r validity_StockNewsAPI, class.source = 'fold-hide', message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
 # ---- Setup ----
@@ -2383,12 +2383,12 @@ final_plot
 
 ```
 
-## Validity of the Binary Classification Labels (Comparison with "Ground Truth" Impacts) {#validity_bin_gold}
+## Validity of the Binary Classification Labels (Comparison with "External Criterion" Impacts) {#validity_bin_gold}
 
-In this section, we will repeat our analysis from the previous section, but this time we will compare the LLM labels with the "ground truth" effects to what actually happened to the stock prices. We will calculate the agreement between the LLM labels and the "ground truth" labels using our agreement metrics.
+In this section, we will repeat our analysis from the previous section, but this time we will compare the LLM labels with the "external criterion" effects to what actually happened to the stock prices. We will calculate the agreement between the LLM labels and the "external criterion" labels using our agreement metrics.
 
 
-### Extracting the Ground Truth Stock Performance
+### Extracting the Stock Performance
 
 In the code chunk below, we use R and the `tidyquant` package to extract the stock prices for the tickers associated with the binary classification labels. We then save the raw stock prices to a CSV file for further analysis.
 
@@ -2399,7 +2399,7 @@ tickers_df = readr::read_csv(
 
 tickers_list = tickers_df$tickers |> unique()
 min_date = min(tickers_df$date)
-max_date = max(tickers_df$date)
+max_date = max(tickers_df$date) + days(3)
 
 
 stock_prices = tidyquant::tq_get(
@@ -2578,7 +2578,7 @@ cat(
 
 ### Visualizing the Validity Metrics 
 
-The comparison against actual market behavior, depicted in the figure below, contrasts the gold standard results. The dot represents each metric's mean value (from its intra-rater five replicates), and the whiskers length reflect the standard error. 
+The comparison against actual market behavior, depicted in the figure below, contrasts the benchmark results. The dot represents each metric's mean value (from its intra-rater five replicates), and the whiskers length reflect the standard error. 
 
 ```{r validity_SP500, class.source = 'fold-hide', message=FALSE, fig.align='center', fig.width=6, fig.height=8, fig.fullwidth=TRUE}
 # library(tidyverse)
@@ -2751,7 +2751,7 @@ table_grob$heights <- ggplot2::unit(rep(1, nrow(table_grob)), "lines") * 0.5
 
 # Add title row
 title_grob <- grid::textGrob(
-  "Validity with Ground Truth",
+  "Validity with external criterion",
   gp = grid::gpar(fontface = "bold", fontsize = 9),
   x = 0.5, hjust = 0.5
 )

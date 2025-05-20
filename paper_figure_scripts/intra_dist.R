@@ -1,39 +1,42 @@
+pacman::p_load(grid, gridExtra, tidyverse)
+source("all_functions.R")
+
 # ---- Setup ----
-chat_models = c(
+chat_models <- c(
   "phi4-mini",
-  "phi4:latest",
   "llama3.2:1B",
-  "llama3.2:3B", 
-  "gemma3:1B",
-  "gemma3:27B",
+  "gemma3:1B",                
   "deepseek-r1:1.5B",
-  "deepseek-r1:7B",
   "command-r7b",
-  "command-r-plus-08-2024",
   "gpt-4o-mini-2024-07-18",
-  "gpt-4o-2024-11-20",
   "claude-3-5-haiku-20241022",
+  "phi4:latest", 
+  "llama3.2:3B", 
+  "gemma3:27B",
+  "deepseek-r1:7B",
+  "command-r-plus-08-2024",
+  "gpt-4o-2024-11-20",
   "claude-3-7-sonnet-20250219"
 )
 
 model_abbrev = c(
   "phi4-mini"                 = "phi4-mini",
-  "phi4:latest"              = "phi4:latest",
   "llama3.2:1B"              = "llama3.2:1B",
-  "llama3.2:3B"              = "llama3.2:3B",
   "gemma3:1B"                = "gemma3:1B",
-  "gemma3:27B"               = "gemma3:27B",
   "deepseek-r1:1.5B"         = "deepseek-r1:1.5B",
-  "deepseek-r1:7B"           = "deepseek-r1:7B",
   "command-r7b"              = "command-r7b",
-  "command-r-plus-08-2024"   = "command-r-plus",
   "gpt-4o-mini-2024-07-18"   = "gpt-4o-mini",
-  "gpt-4o-2024-11-20"        = "gpt-4o",
   "claude-3-5-haiku-20241022"= "claude-3-5-haiku",
+  "phi4:latest"              = "phi4:latest",
+  "llama3.2:3B"              = "llama3.2:3B",
+  "gemma3:27B"               = "gemma3:27B",
+  "deepseek-r1:7B"           = "deepseek-r1:7B",
+  "command-r-plus-08-2024"   = "command-r-plus",
+  "gpt-4o-2024-11-20"        = "gpt-4o",
   "claude-3-7-sonnet-20250219" = "claude-3-7-sonnet"
 )
 
-chat_model_colors = rep(c('#808080', '#C3142D'), length.out = length(chat_models))
+chat_model_colors = rep(c('#808080', '#C3142D'), each = 7)
 chat_model_colors = stats::setNames(chat_model_colors, model_abbrev[chat_models])
 
 
@@ -43,19 +46,17 @@ model_labels <- purrr::map_chr( model_abbrev[chat_models], ~{
 })
 names(model_labels) <- model_abbrev[chat_models]
 
-
+alpha = (1-(1-.1)^(1/7))
 
 
 # ---- Load Data ----
-intra_df = readr::read_csv("../results/binary_reliability_metrics.csv") |>
+intra_df = readr::read_csv("./results/binary_reliability_metrics.csv") |>
   dplyr::mutate(
-    lower_ci = coeff.val - stats::qnorm(0.975) * coeff.se,
-    upper_ci = coeff.val + stats::qnorm(0.975) * coeff.se,
+    lower_ci = coeff.val - stats::qnorm(1-alpha/2) * coeff.se,
+    upper_ci = coeff.val + stats::qnorm(1-alpha/2)* coeff.se,
     abbrev = factor(model_abbrev[model]),
     abbrev = forcats::fct_relevel(abbrev, rev(model_abbrev[chat_models]) )
   )
-
-intra_df |> dplyr::filter(coeff.name == 'AC1')
 
 intra_wide = intra_df |> 
   dplyr::select(abbrev, coeff.name, coeff.val) |> 
@@ -179,7 +180,7 @@ core_llm_indices <- which(
     table_grob$layout$l == 1  # column 1
 )
 
-model_colors <- rep(c("#808080", "#C3142D"), length.out = 14)  # matches intra_wide
+model_colors <- rep(c("#808080", "#C3142D"), each=7)  # matches intra_wide
 
 for (i in seq_along(core_llm_indices)) {
   grob_index <- core_llm_indices[i]
@@ -205,4 +206,4 @@ final_plot <- cowplot::ggdraw() +
 final_plot
 
 
-ggplot2::ggsave("../figs/intra_dist.pdf", width = 4.5, height = 6.5)
+ggplot2::ggsave("./figs/intra_dist.pdf", width = 4.5, height = 6.5)

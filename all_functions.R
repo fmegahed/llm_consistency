@@ -445,7 +445,7 @@ reliability_coefs = function(df, vars){
   
   for (i in seq(1, 5*no_models, by=5)){
     m1 = df_rates |>
-      dplyr::filter(chat_model == llm_models[ceiling(i/6)]) |>
+      dplyr::filter(chat_model == llm_models[ceiling(i/5)]) |>
       dplyr::select(-chat_model)
     df_coefs[i,-1] = irrCAC::conger.kappa.raw(m1)$est
     df_coefs[(i+1),-1] = irrCAC::fleiss.kappa.raw(m1)$est
