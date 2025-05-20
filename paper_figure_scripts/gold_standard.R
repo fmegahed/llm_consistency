@@ -1,3 +1,5 @@
+pacman::p_load(grid, gridExtra, tidyverse)
+
 # ---- Setup ----
 chat_models = c(
   "phi4-mini",
@@ -60,8 +62,8 @@ inter_df =
     "deepseek-r1:7B",   0.832,     0.002,   0.835,   0.005,   0.829,   0.001,   0.830,   0.001,  0.832,   0.003,
     "command-r-plus",   0.774,     0.002,   0.715,   0.002,   0.832,   0.006,   0.810,   0.005,  0.760,   0.002,
     "command-r7b",      0.847,     0.003,   0.883,   0.004,   0.810,   0.003,   0.823,   0.003,  0.852,   0.003,
-    "gpt-4o",           0.787,     0.007,   0.743,   0.011,   0.832,   0.003,   0.815,   0.004,  0.777,   0.008,
     "gpt-4o-mini",      0.820,     0.003,   0.800,   0.005,   0.840,   0.002,   0.834,   0.003,  0.817,   0.004,
+    "gpt-4o",           0.787,     0.007,   0.743,   0.011,   0.832,   0.003,   0.815,   0.004,  0.777,   0.008,
     "claude-3-5-haiku", 0.848,     0.002,   0.882,   0.004,   0.815,   0.003,   0.826,   0.002,  0.853,   0.002,
     "claude-3-7-sonnet",0.831,     0.003,   0.867,   0.004,   0.795,   0.003,   0.809,   0.002,  0.837,   0.003
   )
@@ -165,7 +167,7 @@ table_grob$heights <- ggplot2::unit(rep(1, nrow(table_grob)), "lines") * 0.5
 
 # Add title row
 title_grob <- grid::textGrob(
-  "Validity with StockNewsAPI Labels",
+  "Validity with Benchmark Model",
   gp = grid::gpar(fontface = "bold", fontsize = 9),
   x = 0.5, hjust = 0.5
 )

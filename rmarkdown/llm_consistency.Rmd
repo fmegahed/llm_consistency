@@ -1270,7 +1270,7 @@ plots = purrr::imap(chat_models, function(model, idx) {
     dplyr::mutate(percent = count / sum(count) * 100) |>
     ggplot2::ggplot( ggplot2::aes(x = llm_label, y = percent, fill = llm_label)) +
     ggplot2::geom_bar(stat = "identity", position = "dodge") +
-    ggplot2::geom_text( ggplot2::aes(label = sprintf("%.1f%%", percent)), 
+    ggplot2::geom_text( ggplot2::aes(label = sprintf("%.2f%%", percent)), 
                         vjust = -0.5, size = 3, fontface = "bold") +
     ggplot2::scale_fill_manual(values = label_colors) +
     ggplot2::scale_y_continuous(
@@ -2223,8 +2223,8 @@ inter_df =
     "deepseek-r1:7B",   0.832,     0.002,   0.835,   0.005,   0.829,   0.001,   0.830,   0.001,  0.832,   0.003,
     "command-r-plus",   0.774,     0.002,   0.715,   0.002,   0.832,   0.006,   0.810,   0.005,  0.760,   0.002,
     "command-r7b",      0.847,     0.003,   0.883,   0.004,   0.810,   0.003,   0.823,   0.003,  0.852,   0.003,
-    "gpt-4o",           0.787,     0.007,   0.743,   0.011,   0.832,   0.003,   0.815,   0.004,  0.777,   0.008,
     "gpt-4o-mini",      0.820,     0.003,   0.800,   0.005,   0.840,   0.002,   0.834,   0.003,  0.817,   0.004,
+    "gpt-4o",           0.787,     0.007,   0.743,   0.011,   0.832,   0.003,   0.815,   0.004,  0.777,   0.008,
     "claude-3-5-haiku", 0.848,     0.002,   0.882,   0.004,   0.815,   0.003,   0.826,   0.002,  0.853,   0.002,
     "claude-3-7-sonnet",0.831,     0.003,   0.867,   0.004,   0.795,   0.003,   0.809,   0.002,  0.837,   0.003
   )
@@ -2328,7 +2328,7 @@ table_grob$heights <- ggplot2::unit(rep(1, nrow(table_grob)), "lines") * 0.5
 
 # Add title row
 title_grob <- grid::textGrob(
-  "Validity with StockNewsAPI Labels",
+  "Validity with Benchmark Model",
   gp = grid::gpar(fontface = "bold", fontsize = 9),
   x = 0.5, hjust = 0.5
 )
@@ -2381,10 +2381,17 @@ final_plot
 
 ## Validity of the Binary Classification Labels (Comparison with "External Criterion" Impacts) {#validity_bin_gold}
 
+<<<<<<< Updated upstream
 In this section, we will repeat our analysis from the previous section, but this time we will compare the LLM labels with the "external criterion" effects to what actually happened to the stock prices. We will calculate the agreement between the LLM labels and the "external criterion" labels using our agreement metrics.
 
 
 ### Extracting the Stock Performance
+=======
+In this section, we will repeat our analysis from the previous section, but this time we will compare the LLM labels with the "External Criterion" effects to what actually happened to the stock prices. We will calculate the agreement between the LLM labels and the "External Criterion" labels using our agreement metrics.
+
+
+### Extracting the External Criterion Stock Performance
+>>>>>>> Stashed changes
 
 In the code chunk below, we use R and the `tidyquant` package to extract the stock prices for the tickers associated with the binary classification labels. We then save the raw stock prices to a CSV file for further analysis.
 
@@ -2633,6 +2640,7 @@ names(model_labels) <- model_abbrev[chat_models]
 inter_df = 
   tibble::tribble(
     ~Model,             ~Accuracy, ~Acc_SE, ~TPR,    ~TPR_SE, ~TNR,    ~TNR_SE, ~PPV,    ~PPV_SE, ~F1,    ~F1_SE,
+<<<<<<< Updated upstream
     "phi4-mini",        0.485,     0.001,   0.492,   0.004,   0.478,   0.002,   0.497,   0.001,  0.495,   0.002,
     "phi4:latest",      0.514,     0.002,   0.526,   0.001,   0.501,   0.004,   0.525,   0.002,  0.525,   0.001,
     "llama3.2:1B",      0.526,     0.001,   0.540,   0.000,   0.511,   0.003,   0.536,   0.002,  0.538,   0.001,
@@ -2647,6 +2655,22 @@ inter_df =
     "gpt-4o-mini",      0.516,     0.003,   0.496,   0.005,   0.537,   0.004,   0.529,   0.003,  0.512,   0.004,
     "claude-3-5-haiku", 0.515,     0.003,   0.550,   0.005,   0.478,   0.001,   0.525,   0.002,  0.537,   0.004,
     "claude-3-7-sonnet",0.516,     0.002,   0.549,   0.004,   0.482,   0.002,   0.526,   0.002,  0.537,   0.003
+=======
+    "phi4-mini",        0.487,     0.002,   0.495,   0.002,   0.479,   0.006,   0.485,   0.002,  0.490,   0.000,
+    "phi4:latest",      0.513,     0.003,   0.526,   0.001,   0.500,   0.004,   0.511,   0.003,  0.518,   0.002,
+    "llama3.2:1B",      0.512,     0.000,   0.527,   0.001,   0.497,   0.001,   0.510,   0.000,  0.518,   0.000,
+    "llama3.2:3B",      0.478,     0.000,   0.525,   0.003,   0.432,   0.002,   0.478,   0.000,  0.501,   0.002,
+    "gemma3:1B",        0.489,     0.002,   0.442,   0.005,   0.535,   0.001,   0.486,   0.002,  0.463,   0.004,
+    "gemma3:27B",       0.509,     0.002,   0.505,   0.003,   0.512,   0.001,   0.507,   0.002,  0.506,   0.002,
+    "deepseek-r1:1.5B", 0.493,     0.003,   0.447,   0.010,   0.539,   0.004,   0.490,   0.003,  0.468,   0.007,
+    "deepseek-r1:7B",   0.496,     0.002,   0.509,   0.002,   0.483,   0.001,   0.494,   0.002,  0.501,   0.002,
+    "command-r-plus",   0.512,     0.004,   0.450,   0.002,   0.574,   0.007,   0.511,   0.005,  0.479,   0.003,
+    "command-r7b",      0.507,     0.004,   0.553,   0.002,   0.462,   0.005,   0.505,   0.003,  0.527,   0.003,
+    "gpt-4o-mini",      0.502,     0.002,   0.482,   0.004,   0.522,   0.003,   0.500,   0.003,  0.491,   0.003,
+    "gpt-4o",           0.509,     0.002,   0.461,   0.007,   0.558,   0.005,   0.508,   0.002,  0.483,   0.004,
+    "claude-3-5-haiku", 0.512,     0.003,   0.549,   0.006,   0.476,   0.002,   0.509,   0.003,  0.528,   0.004,
+    "claude-3-7-sonnet",0.514,     0.003,   0.548,   0.005,   0.480,   0.002,   0.511,   0.002,  0.529,   0.004
+>>>>>>> Stashed changes
   )
 
 inter_df = inter_df |> 
@@ -2747,7 +2771,11 @@ table_grob$heights <- ggplot2::unit(rep(1, nrow(table_grob)), "lines") * 0.5
 
 # Add title row
 title_grob <- grid::textGrob(
+<<<<<<< Updated upstream
   "Validity with external criterion",
+=======
+  "Validity with External Criterion",
+>>>>>>> Stashed changes
   gp = grid::gpar(fontface = "bold", fontsize = 9),
   x = 0.5, hjust = 0.5
 )
